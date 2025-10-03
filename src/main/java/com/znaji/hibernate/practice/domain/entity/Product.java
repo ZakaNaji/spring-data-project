@@ -1,10 +1,10 @@
 package com.znaji.hibernate.practice.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
@@ -26,6 +26,25 @@ public class Product {
     public int hashCode() {
         return 2004;
     }
+
+    @Setter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Variant> variants = new ArrayList<>();
+
+    public List<Variant> getVariants() {
+        return List.copyOf(variants);
+    }
+
+    public void addVariant(Variant variant) {
+        variants.add(variant);
+        variant.setProduct(this);
+    }
+
+    public void removeVariant(Variant variant) {
+        variants.remove(variant);
+        variant.setProduct(null);
+    }
+
 
     @Override
     public boolean equals(Object obj) {
