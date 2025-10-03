@@ -25,6 +25,9 @@ public class UserAccount {
     @OneToOne(mappedBy = "userAccount")
     private Seller seller;
 
+    @Embedded
+    private Address address;
+
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {

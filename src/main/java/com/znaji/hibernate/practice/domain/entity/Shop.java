@@ -29,6 +29,9 @@ public class Shop {
     @OneToMany(mappedBy = "shop", orphanRemoval = true, cascade = CascadeType.ALL)
     private List<Product> products = new ArrayList<>();
 
+    @Embedded
+    private Address address;
+
     public List<Product> getProducts() {
         return List.copyOf(products);
     }
