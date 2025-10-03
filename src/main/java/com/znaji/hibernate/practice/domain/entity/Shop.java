@@ -7,41 +7,40 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Set;
 
-@NoArgsConstructor @AllArgsConstructor
+@AllArgsConstructor @NoArgsConstructor
 @Getter @Setter
 @Entity
-public class Seller {
+public class Shop {
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    private String name;
+    private Set<String> tags;
 
-    @MapsId("id")
-    @OneToOne
-    @JoinColumn(name = "id")
-    private UserAccount userAccount;
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "seller_id")
+    private Seller seller;
 
-    @OneToMany(mappedBy = "seller", orphanRemoval = true)
-    private List<Shop> shops;
+    @Override
+    public int hashCode() {
+        return 2022;
+    }
 
     @Override
     public boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
-
         if (this == obj) {
             return true;
         }
-
         if (getClass() != obj.getClass()) {
             return false;
         }
-
-        return id != null && id.equals(((Seller) obj).id);
-    }
-
-    @Override
-    public int hashCode() {
-        return 2001;
+        Shop other = (Shop) obj;
+        return id != null && id.equals(other.id);
     }
 }
