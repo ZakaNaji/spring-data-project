@@ -2,12 +2,12 @@ package com.znaji.hibernate.practice.domain.entity;
 
 import com.znaji.hibernate.practice.domain.value.Address;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter
 @Entity
@@ -28,6 +28,25 @@ public class UserAccount {
 
     @Embedded
     private Address address;
+
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    @OneToMany(mappedBy = "userAccount", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Order> orders = new ArrayList<>();
+
+    public List<Order> getOrders() {
+        return List.copyOf(orders);
+    }
+
+    public void addOrder(Order order) {
+        orders.add(order);
+        order.setUserAccount(this);
+    }
+
+    public void removeOrder(Order order) {
+        orders.remove(order);
+        order.setUserAccount(null);
+    }
 
     @Override
     public boolean equals(Object obj) {
