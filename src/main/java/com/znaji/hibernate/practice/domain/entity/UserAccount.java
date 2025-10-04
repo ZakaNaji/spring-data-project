@@ -1,5 +1,6 @@
 package com.znaji.hibernate.practice.domain.entity;
 
+import com.znaji.hibernate.practice.domain.value.Address;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
