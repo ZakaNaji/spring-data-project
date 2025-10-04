@@ -41,8 +41,9 @@ public class Money {
         return new Money(addedAmount, currency);
     }
 
-    public static Money of(BigDecimal amount, String currencyCode) {
-        return new Money(amount, Currency.getInstance(currencyCode));
+    public Money sub(Money other) {
+        checkCurrency(other);
+        return new Money(this.amount.subtract(other.amount), this.currency);
     }
 
     public Money multiply(int factor) {
@@ -50,10 +51,17 @@ public class Money {
         return new Money(multiplied, currency);
     }
 
+    public static Money of(BigDecimal amount, String currencyCode) {
+        return new Money(amount, Currency.getInstance(currencyCode));
+    }
     private void checkCurrency(Money other) {
         if (!this.currency.equals(other.currency)) {
             throw new UnsupportedOperationException("currency mismatch");
         }
+    }
+
+    public Currency getCurrency() {
+        return currency;
     }
 
     @Override
