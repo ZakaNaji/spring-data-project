@@ -1,4 +1,4 @@
-package com.znaji.hibernate.practice.domain.entity;
+package com.znaji.hibernate.practice.domain.value;
 
 import jakarta.persistence.Embeddable;
 import lombok.AllArgsConstructor;
