@@ -66,6 +66,12 @@
 			<scope>test</scope>
 		</dependency>
 
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-envers</artifactId>
+			<version>6.4.4.Final</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
