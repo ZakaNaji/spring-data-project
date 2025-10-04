@@ -3,7 +3,6 @@ package com.znaji.hibernate.practice.domain.value;
 import com.znaji.hibernate.practice.domain.converter.CurrencyConverter;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
-import jakarta.persistence.Converter;
 import jakarta.persistence.Embeddable;
 
 import java.math.BigDecimal;
@@ -32,14 +31,18 @@ public class Money {
     }
 
     protected Money() {
-        this.amount = BigDecimal.ZERO;
-        this.currency = Currency.getInstance("USD");
+        this.amount = null;
+        this.currency = null;
     }
 
     public Money add(Money other) {
         checkCurrency(other);
         BigDecimal addedAmount = amount.add(other.amount);
         return new Money(addedAmount, currency);
+    }
+
+    public static Money of(BigDecimal amount, String currencyCode) {
+        return new Money(amount, Currency.getInstance(currencyCode));
     }
 
     public Money multiply(int factor) {
