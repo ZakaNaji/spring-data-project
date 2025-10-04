@@ -1,5 +1,6 @@
 package com.znaji.hibernate.practice.domain.entity;
 
+import com.znaji.hibernate.practice.domain.value.Money;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.NaturalId;
@@ -25,6 +26,9 @@ public class Variant {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
+
+    @Embedded
+    private Money price;
 
     @PrePersist
     private void ensureSku() {
