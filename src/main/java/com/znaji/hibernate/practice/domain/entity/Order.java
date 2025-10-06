@@ -2,18 +2,16 @@ package com.znaji.hibernate.practice.domain.entity;
 
 import com.znaji.hibernate.practice.domain.value.Money;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
-import org.hibernate.annotations.Where;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
+import java.util.List;
 
 @Entity
 @Table(name = "orders")
@@ -68,6 +66,26 @@ public class Order {
     @JoinColumn(name = "user_id")
     private UserAccount userAccount;
 
+    @Setter(AccessLevel.NONE)
+    @Getter(AccessLevel.NONE)
+    @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderLine> orderLines = new ArrayList<>();
+
+    public List<OrderLine> getOrderLines() {
+        return List.copyOf(orderLines);
+    }
+
+    public void addOrderLine(OrderLine orderLine) {
+        orderLines.add(orderLine);
+        orderLine.setOrder(this);
+    }
+
+    public void removeOrderLine(OrderLine orderLine) {
+        orderLines.remove(orderLine);
+        orderLine.setOrder(null);
+    }
+
     @PrePersist
     @PreUpdate
     public void guarantyPricesHarmony() {
@@ -101,5 +119,25 @@ public class Order {
         );
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        if (o == this) {
+            return true;
+        }
 
+        if (getClass() != o.getClass()) {
+            return false;
+        }
+
+        Order other = (Order) o;
+        return id != null && id.equals(other.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 2005;
+    }
 }
