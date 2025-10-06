@@ -64,4 +64,18 @@ class OrderTest {
         assertEquals(2, order.getOrderLines().size());
     }
 
+    @Test
+    void shouldFailWhenOrderHasNoLines() {
+        Order order = new Order();
+        order.setStatus(Order.Status.NEW);
+        order.setUserAccount(user);
+
+        em.persist(user);
+
+        assertThrows(IllegalStateException.class, () -> {
+            em.persist(order);
+            em.flush();
+        });
+    }
+
 }
