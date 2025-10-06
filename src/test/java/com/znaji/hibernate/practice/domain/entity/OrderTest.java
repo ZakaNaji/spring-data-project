@@ -106,4 +106,43 @@ class OrderTest {
         });
     }
 
+    @Test
+    void shouldSoftDeleteOrder() {
+        Order order = createOrderWithOneLine();
+        order.setUserAccount(user);
+        em.persist(user);
+        em.persist(order);
+        em.flush();
+
+        Long id = order.getId();
+        em.remove(order);
+        em.flush();
+        em.clear();
+
+        Boolean isDeleted = (Boolean) em.createNativeQuery("select orders.deleted from orders where id= :id")
+                .setParameter("id", id).getSingleResult();
+
+        assertTrue(isDeleted);
+
+        Order order1 = em.find(Order.class, id);
+
+        assertNull(order1);
+    }
+
+
+    private Order createOrderWithOneLine() {
+        Order order = new Order();
+        order.setStatus(Order.Status.NEW);
+        order.setUserAccount(user);
+
+        OrderLine line = new OrderLine();
+        line.setCapturedSku("SKU-1");
+        line.setCapturedName("Item");
+        line.setQuantity(2);
+        line.setUnitPrice(new Money(new BigDecimal("50.00"), USD));
+        order.addOrderLine(line);
+
+        return order;
+    }
+
 }
