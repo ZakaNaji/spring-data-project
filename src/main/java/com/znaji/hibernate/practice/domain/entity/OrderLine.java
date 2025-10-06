@@ -13,7 +13,7 @@ import org.hibernate.envers.Audited;
 @Entity
 @Table(name = "order_line")
 @SQLRestriction("deleted = false")
-@SQLDelete(sql = "update order_line set deleted = false where id = ?")
+@SQLDelete(sql = "update order_line set deleted = true where id = ?")
 @Audited
 @NoArgsConstructor @AllArgsConstructor
 @Getter @Setter

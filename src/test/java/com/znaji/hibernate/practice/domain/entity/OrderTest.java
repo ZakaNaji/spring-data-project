@@ -2,14 +2,18 @@ package com.znaji.hibernate.practice.domain.entity;
 
 import com.znaji.hibernate.practice.domain.value.Money;
 import jakarta.persistence.EntityManager;
+import org.hibernate.envers.AuditReader;
+import org.hibernate.envers.AuditReaderFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.test.context.transaction.TestTransaction;
 
 import java.math.BigDecimal;
 import java.util.Currency;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -127,6 +131,38 @@ class OrderTest {
         Order order1 = em.find(Order.class, id);
 
         assertNull(order1);
+    }
+
+    @Test
+    void shouldCreateOrderRevision() {
+        Order order = createOrderWithOneLine();
+        order.setUserAccount(user);
+        em.persist(user);
+        em.persist(order);
+        em.flush();
+
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        TestTransaction.start();
+        em.clear();
+        order = em.find(Order.class, order.getId());
+        order.setStatus(Order.Status.PAID);
+        em.flush();
+        TestTransaction.flagForCommit();
+        TestTransaction.end();
+
+        TestTransaction.start();
+        em.clear();
+
+        AuditReader reader = AuditReaderFactory.get(em);
+        List<Number> revisions = reader.getRevisions(Order.class, order.getId());
+        assertEquals(2, revisions.size());
+
+        Order order1 = reader.find(Order.class, order.getId(), revisions.get(0));
+        Order order2 = reader.find(Order.class, order.getId(), revisions.get(1));
+        assertEquals(order1.getStatus(), Order.Status.NEW);
+        assertEquals(order2.getStatus(), Order.Status.PAID);
     }
 
 
