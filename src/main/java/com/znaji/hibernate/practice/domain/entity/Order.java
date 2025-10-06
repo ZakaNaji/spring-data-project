@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.RelationTargetAuditMode;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
@@ -88,6 +89,39 @@ public class Order {
 
     @PrePersist
     @PreUpdate
+    public void recalculateTotal() {
+        if (orderLines.isEmpty()) {
+            throw new IllegalStateException("Cannot calculate totals: order has no order lines.");
+        }
+
+        Currency baseCurrency = orderLines.getFirst().getUnitPrice().getCurrency();
+
+        //subTotal:
+        Money subTotal = new Money(BigDecimal.ZERO, baseCurrency);
+        for (var line : orderLines) {
+            if (!line.getUnitPrice().getCurrency().equals(baseCurrency)) {
+                throw new IllegalStateException("Mixed currencies detected within order lines.");
+            }
+            subTotal = subTotal.add(line.getLineTotal());
+        }
+        this.subTotal = subTotal;
+
+        //discount
+        //TODO-DISCOUNT: to impl the real discount logic, after adding the discount entity
+        this.discountTotal = new Money(BigDecimal.ZERO, baseCurrency);
+
+        //tax:
+        //TODO-TAX: impl real logic latter:
+        BigDecimal taxRate = new BigDecimal("0.05");
+        this.taxTotal = new Money(subTotal.getAmount().multiply(taxRate), baseCurrency);
+
+        //grandTotal:
+        this.grandTotal = subTotal.add(taxTotal).sub(discountTotal);
+
+        //guaranty prices harmony:
+        guarantyPricesHarmony();
+    }
+
     public void guarantyPricesHarmony() {
         if (subTotal == null || taxTotal == null || discountTotal == null || grandTotal == null) {
             throw new IllegalStateException("Order totals must all be initialized before saving");

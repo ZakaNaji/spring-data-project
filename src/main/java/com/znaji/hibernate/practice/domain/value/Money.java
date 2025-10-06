@@ -64,6 +64,10 @@ public class Money {
         return currency;
     }
 
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(currency, amount);
