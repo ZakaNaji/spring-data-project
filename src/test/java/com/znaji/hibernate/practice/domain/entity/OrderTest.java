@@ -78,4 +78,32 @@ class OrderTest {
         });
     }
 
+    @Test
+    void shouldFailWhenLinesHaveDiffCurrencies() {
+        Order order = new Order();
+        order.setStatus(Order.Status.NEW);
+        order.setUserAccount(user);
+
+        OrderLine line1 = new OrderLine();
+        line1.setCapturedSku("SKU-1");
+        line1.setCapturedName("Shirt");
+        line1.setQuantity(1);
+        line1.setUnitPrice(new Money(new BigDecimal("50.00"), USD));
+
+        OrderLine line2 = new OrderLine();
+        line2.setCapturedSku("SKU-2");
+        line2.setCapturedName("Shoes");
+        line2.setQuantity(1);
+        line2.setUnitPrice(new Money(new BigDecimal("50.00"), Currency.getInstance("EUR")));
+
+        order.addOrderLine(line1);
+        order.addOrderLine(line2);
+
+        em.persist(user);
+        assertThrows(IllegalStateException.class, () -> {
+            em.persist(order);
+            em.flush();
+        });
+    }
+
 }
